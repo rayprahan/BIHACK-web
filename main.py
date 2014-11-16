@@ -1,5 +1,7 @@
 import pandas as pd
 from flask import Flask, request, url_for, render_template, redirect, flash, jsonify, abort
+from datetime import datetime
+from random import randint
 
 app = Flask(__name__)
 df = pd.read_csv('./data/merged_data.csv')
@@ -10,16 +12,28 @@ def show_index():
 
 @app.route('/map')
 def show_map():
-    return render_template('map.html')
+    return render_template('colored_slow_map.html')
 
 @app.route('/calls')
 def calls():
     return render_template('calls.html')
 
+@app.route('/add_from_map')
+def add_entry_from_map():
+	address = df.Street.ix[randint(0,len(df)), :]
+	r = df[df.Street == address]
+	r['Event Date/Time'] = r['Event Date/Time'].map(lambda x: datetime.strptime(x, r'%m/%d/%y %H:%M'))
+	r.sort('Event Date/Time', ascending=False, inplace=True)
+	print r
+	s = zip(r['Event Date/Time'].tolist(), r.Event.tolist(), r['Event Nature'].tolist())
+	return render_template('AddressExists.html', p='{:.0f}'.format(r.P.max() * 100), name='Al Pacino', dates_records_details=s)
+
 @app.route('/add', methods=['POST'])
 def add_entry():
 	address = request.form['Address'].upper()
-	r = df[df.Street == address].sort('Event Date/Time', ascending=False)
+	r = df[df.Street == address]
+	r['Event Date/Time'] = r['Event Date/Time'].map(lambda x: datetime.strptime(x, r'%m/%d/%y %H:%M'))
+	r.sort('Event Date/Time', ascending=False, inplace=True)
 	print r
 	s = zip(r['Event Date/Time'].tolist(), r.Event.tolist(), r['Event Nature'].tolist())
 	return render_template('AddressExists.html', p='{:.0f}'.format(r.P.max() * 100), name='Al Pacino', dates_records_details=s)
