@@ -2,7 +2,7 @@ import pandas as pd
 from flask import Flask, request, url_for, render_template, redirect, flash, jsonify, abort
 
 app = Flask(__name__)
-df = pd.read_csv('./data/dummy_data.csv')
+df = pd.read_csv('./data/merged_data.csv')
 
 @app.route('/')
 def show_index():
@@ -19,23 +19,14 @@ def calls():
 @app.route('/add', methods=['POST'])
 def add_entry():
 	address = request.form['Address'].upper()
-	r = df[df.Street == address]
+	r = df[df.Street == address].sort('Event Date/Time', ascending=False)
 	s = zip(r['Event Date/Time'].tolist(), r.Event.tolist(), r['Event Nature'].tolist())
-	return render_template('AddressExists.html', p=r.P.max(), name='Al Pacino', dates_records_details=s)
+	return render_template('AddressExists.html', p='{:.2f}'.format(r.P.max()), name='Al Pacino', dates_records_details=s)
 
 @app.route('/api/get_all', methods=['GET'])
 def get_all():
-	master_dict = {}
-	for address in df.Street.drop_duplicates():
-		temp_dict = {}
-		temp_table = df[df.Street == address].ix[:,1:]
-
-		temp_dict['probability'] = temp_table.P.max()
-		temp_dict['incidents'] = temp_table.ix[:,:-1].to_dict('records')
-
-		master_dict[address] = temp_dict
-
-	return jsonify({'get_all': master_dict})
+	to_display = df[['Street','Event','Event Date/Time', 'Event Nature', 'P','yp']].to_json(orient='records')
+	return jsonify({'get_all': to_display})
 
 @app.route('/api/get_profile/<string:address>', methods=['GET'])
 def get_profile(address):
