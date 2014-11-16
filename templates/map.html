@@ -56040,7 +56040,10 @@ var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
     var marker, i;
     var cityCircle;
 
-    for (i = 0; i < 10; i++) {  
+    for (i = 0; i < 1000; i++) {  
+    	var lat = locations[i][1];
+    	var lng = locations[i][2];
+    	var position = new google.maps.LatLng(lat, lng)
 
     var populationOptions = {
       strokeColor: '#FF0000',
@@ -56049,12 +56052,12 @@ var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
       fillColor: '#FF0000',
       fillOpacity: 0.35,
       map: map,
-      center: new google.maps.LatLng(locations[i][1], locations[i][2]),
+      center: position,
       radius: 25
     };
+
     // Add the circle for this city to the map.
     cityCircle = new google.maps.Circle(populationOptions);
-
 
       google.maps.event.addListener(cityCircle, 'click', (function(cityCircle, i) {
         return function() {
@@ -56062,17 +56065,48 @@ var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
           infowindow.setPosition(cityCircle.getCenter());                    
           infowindow.open(map);
         }
+
       })(cityCircle, i));
-    
+
+   
+    var marker = new google.maps.Marker({
+      position: position,
+      map: map,
+    });
+
     google.maps.event.addListener(map, 'click', function() {
-    infowindow.close(map,cityCircle);})
-  }}
+    	infowindow.close(map,cityCircle);})
+	}}
 
   google.maps.event.addDomListener(window, 'load', initialize);
     </script>
   </head>
 <body>
+      <!-- Static navbar
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="{{ url_for('show_index') }}">Home</a></li>
+              <li class="active"><a href="{{ url_for('show_map') }}">Map</a></li>
+              <li><a href="{{ url_for('calls') }}">Call Response</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://www.high-point.net/police/">HPPD</a></li>
+            </ul>
+          </div>
+        </div><
+      </div>
+      -->
 
     <div id="map-canvas"/>
+
+    <div class="container-fluid">
+    	<div class="row text-center" >
+    		<div class="col-md-12">
+            </div>
+        </div>
+    </div>
+
   </body>
 </html>

@@ -21,7 +21,7 @@ def add_entry():
 	address = request.form['Address'].upper()
 	r = df[df.Street == address].sort('Event Date/Time', ascending=False)
 	s = zip(r['Event Date/Time'].tolist(), r.Event.tolist(), r['Event Nature'].tolist())
-	return render_template('AddressExists.html', p='{:.2f}'.format(r.P.max()), name='Al Pacino', dates_records_details=s)
+	return render_template('AddressExists.html', p='{:.0f}'.format(r.P.max() * 100), name='Al Pacino', dates_records_details=s)
 
 @app.route('/api/get_all', methods=['GET'])
 def get_all():
