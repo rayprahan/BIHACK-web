@@ -19,7 +19,7 @@ def calls():
     return render_template('calls.html')
 
 @app.route('/add_from_map')
-def add_entry_from_map():
+def add_from_map():
 	address = df.Street.ix[randint(0,len(df)), :]
 	r = df[df.Street == address]
 	r['Event Date/Time'] = r['Event Date/Time'].map(lambda x: datetime.strptime(x, r'%m/%d/%y %H:%M'))
